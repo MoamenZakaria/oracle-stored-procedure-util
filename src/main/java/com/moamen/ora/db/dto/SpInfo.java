@@ -30,7 +30,7 @@ public class SpInfo {
         String spName;
         String paramName;
         String paramType;
-        String value;
+        String value = "placeholder";
         String javaType;
         String sqlType;
     }

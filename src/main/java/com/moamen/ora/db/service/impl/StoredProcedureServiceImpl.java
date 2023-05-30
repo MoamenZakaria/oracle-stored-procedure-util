@@ -8,9 +8,8 @@ import com.moamen.ora.db.service.StoredProcedureService;
 import com.moamen.ora.db.dao.OracleStoredProcedureInfo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.List;
 
 @ApplicationScoped
 public class StoredProcedureServiceImpl implements StoredProcedureService {
@@ -18,18 +17,13 @@ public class StoredProcedureServiceImpl implements StoredProcedureService {
     OracleStoredProcedureInfo oracleStoredProcedureInfo;
 
     @Override
-    public SpInfo getSpInfo(String spName, String packageName, String owner) throws JsonProcessingException {
+    public SpInfo getSpInfo(String spName, String packageName, String owner)  {
 
-        final String result = oracleStoredProcedureInfo.fetchSpInfoByName(spName, packageName, owner);
-        if (StringUtils.isBlank(result)) {
-            throw new RuntimeException("No result found for stored procedure : " + spName);
+        final SpInfo result = oracleStoredProcedureInfo.fetchSpInfoByName(spName, packageName, owner);
+        if (ObjectUtils.isEmpty(result)) {
+            throw new RuntimeException("Error: No stored procedure matching the search criteria was found, or the found stored procedure '" + spName + "' does not have any IN or OUT parameters.");
         }
-        ObjectMapper objectMapper = new ObjectMapper();
-        SpInfo spMetadata = SpInfo.builder().spName(spName).packageName(packageName).owner(owner).build();
-        List<SpInfo.SpParams> spParamDTOs = objectMapper.readValue(result, new TypeReference<List<SpInfo.SpParams>>() {
-        });
-        spMetadata.setSpParams(spParamDTOs);
-        return spMetadata;
+        return result;
 
     }
 }

@@ -7,12 +7,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @ApplicationScoped
 public class SpInfoMapper {
-
-
     public FetchSpInfoResponse mapSpInfoToResponse(SpInfo spInfo) {
+        if (Objects.isNull(spInfo)) {
+            throw new RuntimeException("Error: spInfo is null. can not map to response.");
+        }
         List<FetchSpInfoResponse.SpParam> spInParams = new ArrayList<>();
         List<FetchSpInfoResponse.SpParam> spOutParams = new ArrayList<>();
 
@@ -23,6 +25,7 @@ public class SpInfoMapper {
                     .value(spParam.getValue())
                     .javaType(spParam.getJavaType())
                     .sqlType(spParam.getSqlType())
+                    .javaType(OracleTypeConverter.convertToJavaType(spParam.getSqlType()).getSimpleName())
                     .build();
 
             if (spParam.getParamType().equals("IN")) {
